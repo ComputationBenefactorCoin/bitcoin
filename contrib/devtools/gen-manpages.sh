@@ -10,18 +10,18 @@ BUILDDIR=${BUILDDIR:-$TOPDIR}
 BINDIR=${BINDIR:-$BUILDDIR/src}
 MANDIR=${MANDIR:-$TOPDIR/doc/man}
 
-BITCOIND=${BITCOIND:-$BINDIR/bitcoind}
-BITCOINCLI=${BITCOINCLI:-$BINDIR/bitcoin-cli}
-BITCOINTX=${BITCOINTX:-$BINDIR/bitcoin-tx}
-WALLET_TOOL=${WALLET_TOOL:-$BINDIR/bitcoin-wallet}
-BITCOINUTIL=${BITCOINQT:-$BINDIR/bitcoin-util}
-BITCOINQT=${BITCOINQT:-$BINDIR/qt/bitcoin-qt}
+XCBCD=${XCBCD:-$BINDIR/xcbcd}
+XCBCCLI=${XCBCCLI:-$BINDIR/xcbc-cli}
+XCBCTX=${XCBCTX:-$BINDIR/xcbc-tx}
+WALLET_TOOL=${WALLET_TOOL:-$BINDIR/xcbc-wallet}
+XCBCUTIL=${XCBCQT:-$BINDIR/xcbc-util}
+XCBCQT=${XCBCQT:-$BINDIR/qt/xcbc-qt}
 
-[ ! -x $BITCOIND ] && echo "$BITCOIND not found or not executable." && exit 1
+[ ! -x $XCBCD ] && echo "$XCBCD not found or not executable." && exit 1
 
 # Don't allow man pages to be generated for binaries built from a dirty tree
 DIRTY=""
-for cmd in $BITCOIND $BITCOINCLI $BITCOINTX $WALLET_TOOL $BITCOINUTIL $BITCOINQT; do
+for cmd in $XCBCD $XCBCCLI $XCBCTX $WALLET_TOOL $XCBCUTIL $XCBCQT; do
   VERSION_OUTPUT=$($cmd --version)
   if [[ $VERSION_OUTPUT == *"dirty"* ]]; then
     DIRTY="${DIRTY}${cmd}\n"
@@ -36,17 +36,17 @@ then
 fi
 
 # The autodetected version git tag can screw up manpage output a little bit
-read -r -a BTCVER <<< "$($BITCOINCLI --version | head -n1 | awk -F'[ -]' '{ print $6, $7 }')"
+read -r -a XCBCVER <<< "$($XCBCCLI --version | head -n1 | awk -F'[ -]' '{ print $6, $7 }')"
 
 # Create a footer file with copyright content.
-# This gets autodetected fine for bitcoind if --version-string is not set,
-# but has different outcomes for bitcoin-qt and bitcoin-cli.
+# This gets autodetected fine for xcbcd if --version-string is not set,
+# but has different outcomes for xcbc-qt and xcbc-cli.
 echo "[COPYRIGHT]" > footer.h2m
-$BITCOIND --version | sed -n '1!p' >> footer.h2m
+$XCBCD --version | sed -n '1!p' >> footer.h2m
 
-for cmd in $BITCOIND $BITCOINCLI $BITCOINTX $WALLET_TOOL $BITCOINUTIL $BITCOINQT; do
+for cmd in $XCBCD $XCBCCLI $XCBCTX $WALLET_TOOL $XCBCUTIL $XCBCQT; do
   cmdname="${cmd##*/}"
-  help2man -N --version-string=${BTCVER[0]} --include=footer.h2m -o ${MANDIR}/${cmdname}.1 ${cmd}
+  help2man -N --version-string=${XCBCVER[0]} --include=footer.h2m -o ${MANDIR}/${cmdname}.1 ${cmd}
 done
 
 rm -f footer.h2m
